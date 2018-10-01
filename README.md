@@ -18,5 +18,5 @@ Tested on macOS 10.13 with Python 3.7. Should be compatible with Linux and Pytho
 7. Start the app with `python manage.py runserver`
 8. Open your web browser and navigate to <http://127.0.0.1:8000/weather?$QUERY>
 9. Results!
-10. You can stop the Flask server by hitting `Ctrl+C`
+10. You can stop the Django server by hitting `Ctrl+C`
 11. Close the virtualenv with the command `deactivate`
