@@ -1,6 +1,33 @@
 import requests
+from django.http import JsonResponse
 
-def get_weather(latitude_in, longitude_in, filters):
+def get_weather(request):
+
+    # Make sure the lat and long values we'e been passed are actually numbers
+    try:
+        latitude_in = request.GET['latitude']
+        longitude_in = request.GET['longitude']
+        latitude, longitude = float(latitude_in), float(longitude_in)
+    except:
+        return JsonResponse({'Error' :'Please include latitude and longitude'})
+
+    filters = request.GET.get('filters', None)
+    # If we have filters, put them in a list
+    if filters:
+        filters = filters.split(',')
+    print(filters)
+
+    results = get_avg_temp(latitude, longitude, filters)
+
+    # If we did not get an answer
+    # Pass on the error
+    if not results[0]:
+        return JsonResponse({'Error' : results[1]})
+
+    return JsonResponse({'Data' : {'Temperature' : {'Fahrenheit' : results[1]}}})
+
+
+def get_avg_temp(latitude, longitude, filters):
     '''
     Returns a tuple containing:
     1. True or false to indicate whether or not the API calls were successful
@@ -13,12 +40,6 @@ def get_weather(latitude_in, longitude_in, filters):
             'weather.com' : {'temp' : 0.0, 'func' : get_weather_dot_com},
             'accuweather' : {'temp' : 0.0, 'func' : get_accuweather}}
     
-    # Make sure the lat and long values we'e been passed are actually numbers
-    try:
-        latitude, longitude = float(latitude_in), float(longitude_in)
-    except:
-        return (False, 'Please include latitude and longitude')
-
     # If there aren't any services in filters, then we'll add all of them
     # That makes the next step pretty cool
     if not filters:
@@ -27,7 +48,7 @@ def get_weather(latitude_in, longitude_in, filters):
     # Find the temperature for each requested service
     for service in filters:
         try:
-            result = apis[service][func](latitude, longitude)
+            result = apis[service]['func'](latitude, longitude)
             # Check if the result was actually returned
             if result[0]:
                 # We could add celsius pretty easily here too
@@ -39,9 +60,8 @@ def get_weather(latitude_in, longitude_in, filters):
 
         # This should only happen if an invalid service is requested
         except Exception as ex:
-            # log exception
-            return (False, 'An invalid service was requested.\
-                The available services are: noaa, weather.com, accuweather')
+            # print(ex)
+            return (False, 'An invalid service was requested. The available services are: noaa, weather.com, accuweather')
 
     # If no API calls were successful
     if successes == 0:

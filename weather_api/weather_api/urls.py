@@ -19,5 +19,5 @@ from weather_api import weather
 # if we want to add zip, we'll have to come up with a regex instead?
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('weather<str:latitude><str:longitude><str:filters>', weather.get_weather)
+    path('weather', weather.get_weather)
 ]
