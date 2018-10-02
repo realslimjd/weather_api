@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from weather_api import weather
-# if we want to add zip, we'll have to come up with a regex instead?
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('weather', weather.get_weather)
